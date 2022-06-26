@@ -7,8 +7,6 @@ var path = require("path");
 var User = require("../models/user");
 var jwt = require("../services/jwt");
 
-const secret = "BrayChatApp-Secret-Password";
-
 var controller = {
   register: function (req, res) {
     // * collect data from request and check if data is valid
@@ -123,7 +121,7 @@ var controller = {
             .send({ message: "getToken parameter is required" });
 
         // * send success response to client
-        delete user.password;
+        user.password = undefined;
         return res
           .status(200)
           .send({ message: "Login success", token: jwt.createToken(user) });
@@ -222,19 +220,48 @@ var controller = {
 
   getAvatar: function (req, res) {
     var file_name = "avatar.png";
+    var avatarId = req.params.id;
     var userId = req.user.sub;
-    User.findById(userId, (err, user) => {
-      if (err) return res.status(500).send({ message: "Server error to find user" });
+    User.findById(avatarId || userId, (err, user) => {
+      if (err)
+        return res.status(500).send({ message: "Server error to find user" });
       if (!user) return res.status(404).send({ message: "User not found" });
-      if (!user.image) return res.status(200).send({ message: "User not have avatar", file_name: file_name });
+      if (!user.image)
+        return res
+          .status(200)
+          .send({ message: "User not have avatar", file_name: file_name });
       file_name = user.image;
       var path_file = "./uploads/users/" + user.image;
       fs.access(path_file, (exists) => {
-        if (!exists) return res.status(200).send({ message: "User not have avatar", file_name: file_name });
+        if (!exists)
+          return res
+            .status(200)
+            .send({ message: "User not have avatar", file_name: file_name });
         return res.sendFile(path.resolve(path_file));
       });
     });
   },
-};
+
+  getUsers: function (req, res) {
+    User.find().exec((err, users) => {
+      if (err)
+        return res.status(500).send({ message: "Server error to find users" });
+      if (!users) return res.status(404).send({ message: "Users not found" });
+      return res.status(200).send({ users: users });
+    });
+  },
+
+  getUser: function (req, res) {
+    var userId = req.params.id;
+    var userSelfId = req.user.sub;
+    User.findById(userId || userSelfId, (err, user) => {
+      if (err)
+        return res.status(500).send({ message: "Server error to find user" });
+      if (!user) return res.status(404).send({ message: "User not found" });
+      user.password = undefined;
+      return res.status(200).send({ user: user });
+    });
+  },
+}; // * end controller
 
 module.exports = controller;

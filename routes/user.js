@@ -12,6 +12,8 @@ router.post("/register", userController.register);
 router.post("/login", userController.login);
 router.put("/update", md_auth.authenticated, userController.update);
 router.post("/upload-avatar", [md_auth.authenticated, md_upload], userController.uploadAvatar);
-router.get("/avatar", md_auth.authenticated, userController.getAvatar);
+router.get("/avatar/:id?", md_auth.authenticated, userController.getAvatar);
+router.get("/getUser/:id?", md_auth.authenticated, userController.getUser);
+router.get("/getUsers", md_auth.authenticated, userController.getUsers);
 
 module.exports = router;
