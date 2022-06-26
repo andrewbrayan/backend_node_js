@@ -9,6 +9,7 @@ var app = express();
 
 // * charger routes files
 var userRoutes = require("./routes/user");
+var chatRoutes = require("./routes/chat");
 
 // * charger middlewares
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -17,7 +18,7 @@ app.use(bodyParser.json());
 // * CORS
 
 // * rewriter routes
-app.use("/api", userRoutes);
+app.use("/api", [userRoutes, chatRoutes]);
 
 // * export module
 module.exports = app;
