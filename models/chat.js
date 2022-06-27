@@ -6,10 +6,10 @@ var schema = mongoose.Schema;
 var messageSchema = new schema({
   content: {
     message: String,
-    multimedia: [any]
+    multimedia: [],
   },
   createdAt: { type: Date, default: Date.now },
-  users: [{ type: schema.ObjectId, ref: "User" }],
+  user: { type: schema.ObjectId, ref: "User" },
 });
 
 // * create schema for chat model

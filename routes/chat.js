@@ -6,6 +6,6 @@ var md_auth = require('../middlewares/authenticated');
 
 var router = express.Router();
 
-router.get('/test', chatController.test);
+router.post('/createChat', md_auth.authenticated, chatController.createChat);
 
 module.exports = router;
