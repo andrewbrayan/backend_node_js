@@ -5,6 +5,7 @@ var schema = mongoose.Schema;
 var userSchema = new schema({
   name: String,
   surname: String,
+  username: String,
   email: String,
   password: String,
   image: String,
@@ -15,8 +16,8 @@ userSchema.methods.toJSON = function () {
   var userObject = this.toObject();
   delete userObject.password;
   delete userObject.email;
-  delete userObject.role;  
+  delete userObject.role;
   return userObject;
-}
+};
 
 module.exports = mongoose.model("User", userSchema);
