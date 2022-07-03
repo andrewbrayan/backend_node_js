@@ -12,7 +12,6 @@ var controller = {
     // * collect data from request and check if data is valid
     var params = req.body;
     try {
-      var validate_username = !validator.isEmpty(params.username);
       var validate_email = validator.isEmail(params.email);
       var validate_password = validator.isLength(params.password, {
         min: 6,
@@ -22,10 +21,9 @@ var controller = {
       return res.status(200).send({ message: "Data not valid or incomplete" });
     }
 
-    if (!validate_username || !validate_email || !validate_password)
+    if (!validate_email || !validate_password)
       return res.status(200).send({
         message: "Data not valid or incomplete",
-        validate_username: validate_username,
         validate_email: validate_email,
         validate_password: validate_password,
       });
@@ -34,50 +32,40 @@ var controller = {
     var user = new User();
     user.name = null;
     user.surname = null;
-    user.username = params.username.toLowerCase();
     user.email = params.email.toLowerCase();
     user.password = params.password;
     user.role = "NEW_USER";
     user.image = null;
 
-    // * check if user exist in database with same email and username and save it in database if not exist
+    // * check if user exist in database with same email and save it in database if not exist
     User.findOne({ email: user.email }, (err, issetEmail) => {
       if (err)
         return res.status(500).send({ message: "Server error to find Email" });
       if (issetEmail)
         return res.status(200).send({ message: "Email already exist" });
 
-      User.findOne({ username: user.username }, (err, issetUsername) => {
+      // * cipher password
+      bcrypt.hash(user.password, 10, (err, hash) => {
         if (err)
           return res
             .status(500)
-            .send({ message: "Server error to find username" });
-        if (issetUsername)
-          return res.status(200).send({ message: "Username already exist" });
+            .send({ message: "Server error to hash password" });
 
-        // * cipher password
-        bcrypt.hash(user.password, 10, (err, hash) => {
+        // * save user in database
+        user.password = hash;
+        user.save((err, userStored) => {
           if (err)
             return res
               .status(500)
-              .send({ message: "Server error to hash password" });
+              .send({ message: "Server error to save user" });
+          if (!userStored)
+            return res.status(404).send({ message: "User not saved" });
 
-          // * save user in database
-          user.password = hash;
-          user.save((err, userStored) => {
-            if (err)
-              return res
-                .status(500)
-                .send({ message: "Server error to save user" });
-            if (!userStored)
-              return res.status(404).send({ message: "User not saved" });
-
-            return res
-              .status(200)
-              .send({ message: "User created", user: userStored });
-          }); // * end save user in database
-        }); // * end cipher password
-      });
+          return res
+            .status(200)
+            .send({ message: "User created", user: userStored });
+        }); // * end save user in database
+      }); // * end cipher password
     });
   },
 

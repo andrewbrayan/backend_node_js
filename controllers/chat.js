@@ -2,6 +2,7 @@
 
 var validator = require("validator");
 var Chat = require("../models/chat");
+var Message = require("../models/message");
 
 var controller = {
   createChat: function (req, res) {
@@ -20,6 +21,14 @@ var controller = {
       return res
         .status(200)
         .send({ message: "Data not valid or incomplete", params });
+
+    if (params.userid === user.sub)
+      return res
+        .status(200)
+        .send({
+          message: "Users ids are equals",
+          result: { userIdFirst: user.sub, userIdSecond: user.sub },
+        });
 
     var chat = new Chat();
     chat.type = params.type;
@@ -48,48 +57,39 @@ var controller = {
       if (err) return res.status(500).send({ message: "Error finding chat" });
       if (!chats) return res.status(404).send({ message: "Chats not found" });
       return res.status(200).send({ chats });
-    });
+    }).populate("users").populate("messages");
+  },
+
+  addMessage: function (req, res) {
+    var params = req.body;
+    var chatid = req.params.id;
+    var user = req.user;
+
+    Chat.findById(chatid, (err, chat) => {
+      if (err) return res.status(500).send({ message: "Error finding chat" });
+      if (!chat) return res.status(404).send({ message: "Chat not found" });
+
+      var message = new Message();
+      message.content.message = params.message;
+      message.user = user.sub;
+
+      chat.messages.push(message);
+
+      message.save((err, messageStored) => {
+        if (err)
+          return res.status(500).send({ message: "Error saving message" });
+        if (!messageStored)
+          return res.status(404).send({ message: "Message not saved" });
+        chat.save((err, chatStored) => {
+          if (err)
+            return res.status(500).send({ message: "Error saving chat" });
+          if (!chatStored)
+            return res.status(404).send({ message: "Chat not saved" });
+          return res.status(200).send({ chat: chatStored });
+        });
+      });
+    })
   }
-
-  // addMessage: function (req, res) {
-  //   var params = req.body;
-  //   var user = req.user;
-
-  //   try {
-  //     var validate_chat = !validator.isEmpty(params.chatid);
-  //     var validate_message = !validator.isEmpty(params.message);
-  //   } catch (error) {
-  //     return res
-  //       .status(200)
-  //       .send({ message: "Data not valid or incomplete", params: params });
-  //   }
-  //   if (!validate_chat || !validate_message)
-  //     return res
-  //       .status(200)
-  //       .send({ message: "Data not valid or incomplete", params });
-
-  //   Chat.findById(params.chatid, (err, chat) => {
-  //     if (err) return res.status(500).send({ message: "Error finding chat" });
-  //     if (!chat) return res.status(404).send({ message: "Chat not found" });
-  //     if (chat.users.indexOf(user.sub) < 0)
-  //       return res.status(404).send({ message: "Chat not found" });
-
-  //     chat.messages.push({
-  //       user: user.sub,
-  //       message: params.message
-  //     });
-
-  //     chat.save((err, chatStored) => {
-  //       if (err)
-  //         return res.status(500).send({ message: "Error saving chat" });
-  //       if (!chatStored)
-  //         return res.status(404).send({ message: "Chat not saved" });
-  //       return res.status(200).send({ chat: chatStored });
-  //     });
-
-  //   }).populate("users");
-  // }
-  
 };
 
 module.exports = controller;
