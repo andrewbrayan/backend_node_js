@@ -7,7 +7,7 @@ var port = process.env.PORT || 3000;
 // * connect to mongoDB
 moongoose.Promise = global.Promise;
 moongoose
-  .connect("mongodb://localhost:27017/BrayChatApp", { useNewUrlParser: true })
+  .connect("mongodb+srv://AndrewBrayan:Rxg3RK95@bamchat.nm4xzq7.mongodb.net/?retryWrites=true&w=majority", { useNewUrlParser: true })
   .then(() => {
     console.log("Connected to MongoDB successfully");
 

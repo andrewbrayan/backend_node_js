@@ -4,7 +4,8 @@
   "description": "API rest full con node para app de chat",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "node test/run"
   },
   "author": "Brayan Martinez",
