@@ -32,6 +32,7 @@ var controller = {
     var user = new User();
     user.name = null;
     user.surname = null;
+    user.username = params.username.toLowerCase();
     user.email = params.email.toLowerCase();
     user.password = params.password;
     user.role = "NEW_USER";
@@ -43,29 +44,35 @@ var controller = {
         return res.status(500).send({ message: "Server error to find Email" });
       if (issetEmail)
         return res.status(200).send({ message: "Email already exist" });
-
-      // * cipher password
-      bcrypt.hash(user.password, 10, (err, hash) => {
+      User.findOne({ name: user.username }, (err, issetName) => {
         if (err)
-          return res
-            .status(500)
-            .send({ message: "Server error to hash password" });
+          return res.status(500).send({ message: "Server error to find Name" });
+        if (issetName)
+          return res.status(200).send({ message: "Name already exist" });
 
-        // * save user in database
-        user.password = hash;
-        user.save((err, userStored) => {
+        // * cipher password
+        bcrypt.hash(user.password, 10, (err, hash) => {
           if (err)
             return res
               .status(500)
-              .send({ message: "Server error to save user" });
-          if (!userStored)
-            return res.status(404).send({ message: "User not saved" });
+              .send({ message: "Server error to hash password" });
 
-          return res
-            .status(200)
-            .send({ message: "User created", user: userStored });
-        }); // * end save user in database
-      }); // * end cipher password
+          // * save user in database
+          user.password = hash;
+          user.save((err, userStored) => {
+            if (err)
+              return res
+                .status(500)
+                .send({ message: "Server error to save user" });
+            if (!userStored)
+              return res.status(404).send({ message: "User not saved" });
+
+            return res
+              .status(200)
+              .send({ message: "User created", user: userStored });
+          }); // * end save user in database
+        }); // * end cipher password
+      });
     });
   },
 
