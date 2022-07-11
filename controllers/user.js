@@ -12,6 +12,7 @@ var controller = {
     // * collect data from request and check if data is valid
     var params = req.body;
     try {
+      var validate_username = validator.isEmpty(params.username);
       var validate_email = validator.isEmail(params.email);
       var validate_password = validator.isLength(params.password, {
         min: 6,
@@ -26,6 +27,7 @@ var controller = {
         message: "Data not valid or incomplete",
         validate_email: validate_email,
         validate_password: validate_password,
+        validate_username: validate_username,
       });
 
     // * create object user and assign data from request
