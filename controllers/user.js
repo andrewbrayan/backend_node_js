@@ -46,7 +46,7 @@ var controller = {
         return res.status(500).send({ message: "Server error to find Email" });
       if (issetEmail)
         return res.status(200).send({ message: "Email already exist" });
-      User.findOne({ name: user.username }, (err, issetName) => {
+      User.findOne({ username: user.username }, (err, issetName) => {
         if (err)
           return res.status(500).send({ message: "Server error to find Name" });
         if (issetName)
