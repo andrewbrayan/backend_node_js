@@ -256,7 +256,7 @@ var controller = {
         return res.status(500).send({ message: "Server error to find user" });
       if (!user) return res.status(404).send({ message: "User not found" });
       user.password = undefined;
-      return res.status(200).send({ user: user });
+      return res.status(200).send({ user });
     });
   },
 }; // * end controller
