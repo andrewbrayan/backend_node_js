@@ -244,7 +244,7 @@ var controller = {
       if (err)
         return res.status(500).send({ message: "Server error to find users" });
       if (!users) return res.status(404).send({ message: "Users not found" });
-      return res.status(200).send({ users: users });
+      return res.status(200).send(users);
     });
   },
 
@@ -256,7 +256,8 @@ var controller = {
         return res.status(500).send({ message: "Server error to find user" });
       if (!user) return res.status(404).send({ message: "User not found" });
       user.password = undefined;
-      return res.status(200).send({ user });
+      console.log(user);
+      return res.status(200).send(user);
     });
   },
 }; // * end controller

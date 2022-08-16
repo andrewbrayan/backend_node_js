@@ -56,7 +56,7 @@ var controller = {
     Chat.find({ users: { $in: user.sub } }).exec((err, chats) => {
       if (err) return res.status(500).send({ message: "Error finding chat" });
       if (!chats) return res.status(404).send({ message: "Chats not found" });
-      return res.status(200).send({ chats });
+      return res.status(200).send(chats);
     })
   },
 
