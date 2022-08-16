@@ -54,10 +54,11 @@ var controller = {
     var user = req.user;
 
     Chat.find({ users: { $in: user.sub } }).exec((err, chats) => {
+      console.log(chats);
       if (err) return res.status(500).send({ message: "Error finding chat" });
       if (!chats) return res.status(404).send({ message: "Chats not found" });
       return res.status(200).send({ chats });
-    }).populate("users").populate("messages");
+    })
   },
 
   addMessage: function (req, res) {
