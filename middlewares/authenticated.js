@@ -13,7 +13,7 @@ exports.authenticated = function (req, res, next) {
     if (payload.exp <= moment().unix()) return res.status(401).send({ message: "Token expired." });
 
   } catch (err) {
-    return res.status(500).send({ message: "Failed to authenticate token." });
+    return res.status(403).send({ message: "Failed to authenticate token." });
   }
 
   req.user = payload;
