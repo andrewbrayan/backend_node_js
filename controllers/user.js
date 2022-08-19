@@ -178,10 +178,11 @@ var controller = {
     var file_name = "Not uploaded...";
     var userId = req.user.sub;
     if (!req.files)
-      return re
+      return res
         .status(404)
         .send({ message: "No files to upload", file_name: file_name });
 
+    console.log(req.files);
     var file_path = req.files.image.path;
     var file_split = file_path.split("\\");
     file_name = file_split[2];
@@ -226,14 +227,14 @@ var controller = {
       if (!user.image)
         return res
           .status(200)
-          .send({ message: "User not have avatar", file_name: file_name });
+          .send({ message: "User not have avatar 1" });
       file_name = user.image;
       var path_file = "./uploads/users/" + user.image;
-      fs.access(path_file, (exists) => {
-        if (!exists)
+      fs.access(path_file => {
+        if (!path_file)
           return res
             .status(200)
-            .send({ message: "User not have avatar", file_name: file_name });
+            .send({ message: "User not have avatar 2" });
         return res.sendFile(path.resolve(path_file));
       });
     });
