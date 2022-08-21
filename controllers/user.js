@@ -20,18 +20,18 @@ async function createAndUploadFile(auth, path, fileName) {
   const driveService = google.drive({ version: "v3", auth });
   let fileMetadata = {
     name: fileName,
-    parent: "11QQXXJZdJ3VU__f586ROB8y81uZrynDF"    
-  } 
+    parent: "11QQXXJZdJ3VU__f586ROB8y81uZrynDF",
+  };
 
   let media = {
     mimeType: "image/*",
-    body: fs.createReadStream(path)
-  }
+    body: fs.createReadStream(path),
+  };
 
   let file = await driveService.files.create({
     resource: fileMetadata,
     media: media,
-    fields: "id"
+    fields: "id",
   });
 
   switch (file.status) {
@@ -215,7 +215,7 @@ var controller = {
     // create a new google drive client with de keyfile and scope
     const auth = new google.auth.GoogleAuth({
       keyFile: KEYFILEPAHT,
-      scopes: SCOPE
+      scopes: SCOPE,
     });
 
     var file_name = "Not uploaded...";
@@ -231,7 +231,7 @@ var controller = {
     file_name = file_split[2];
     var file_ext = file_name.split(".")[1];
     var file_ext_valid = ["png", "jpg", "jpeg", "gif"];
-    
+
     if (file_ext_valid.indexOf(file_ext) < 0) {
       fs.unlink(file_path, (err) => {
         if (err)
@@ -254,19 +254,33 @@ var controller = {
         if (!userUpdated)
           return res.status(404).send({ message: "User not updated" });
 
-        createAndUploadFile(auth, file_path, file_name).then((response) => {
-          return res
-          .status(200)
-          .send({ message: "User updated", user: userUpdated, response: response });
-        }).catch((err) => {
-          fs.unlink(file_path, (err) => {
-            if (err)
-              return res.status(500).send({ message: "Error to delete file" });
+        createAndUploadFile(auth, file_path, file_name)
+          .then((response) => {
+            fs.unlink(file_path, (err) => {
+              if (err)
+                return res
+                  .status(500)
+                  .send({ message: "Error to delete file" });
+            });
+            return res
+              .status(200)
+              .send({
+                message: "User updated",
+                user: userUpdated,
+                response: response,
+              });
+          })
+          .catch((err) => {
+            fs.unlink(file_path, (err) => {
+              if (err)
+                return res
+                  .status(500)
+                  .send({ message: "Error to delete file" });
+            });
+            return res
+              .status(500)
+              .send({ message: "Error to upload file", error: err });
           });
-          return res.status(500).send({ message: "Error to upload file", error: err });
-        })
-
-
       }
     );
   },
@@ -280,16 +294,12 @@ var controller = {
         return res.status(500).send({ message: "Server error to find user" });
       if (!user) return res.status(404).send({ message: "User not found" });
       if (!user.image)
-        return res
-          .status(200)
-          .send({ message: "User not have avatar 1" });
+        return res.status(200).send({ message: "User not have avatar 1" });
       file_name = user.image;
       var path_file = "./uploads/users/" + user.image;
-      fs.access(path_file => {
+      fs.access((path_file) => {
         if (!path_file)
-          return res
-            .status(200)
-            .send({ message: "User not have avatar 2" });
+          return res.status(200).send({ message: "User not have avatar 2" });
         return res.sendFile(path.resolve(path_file));
       });
     });
