@@ -6,6 +6,43 @@ var fs = require("fs");
 var path = require("path");
 var User = require("../models/user");
 var jwt = require("../services/jwt");
+var readline = require("readline");
+var { google } = require("googleapis");
+
+// service account key file for google cloud platform
+const KEYFILEPAHT = "../chatcdn-455b923b9892.json";
+
+// add drive scope will give us full access to google the drive account
+const SCOPE = ["https://www.googleapis.com/auth/drive"];
+
+// funcion google drive api
+async function createAndUploadFile(auth, path, fileName) {
+  const driveService = google.drive({ version: "v3", auth });
+  let fileMetadata = {
+    name: fileName,
+    parent: "11QQXXJZdJ3VU__f586ROB8y81uZrynDF"    
+  } 
+
+  let media = {
+    mimeType: "image/*",
+    body: fs.createReadStream(path)
+  }
+
+  let file = await driveService.files.create({
+    resource: fileMetadata,
+    media: media,
+    fields: "id"
+  });
+
+  switch (file.status) {
+    case "200":
+      console.log("File created successfully.", file.data.id);
+      break;
+    case "error":
+      console.log("Error creating file.");
+      break;
+  }
+}
 
 var controller = {
   register: function (req, res) {
@@ -175,6 +212,12 @@ var controller = {
   },
 
   uploadAvatar: function (req, res) {
+    // create a new google drive client with de keyfile and scope
+    const auth = new google.auth.GoogleAuth({
+      keyFile: KEYFILEPAHT,
+      scopes: SCOPE
+    });
+
     var file_name = "Not uploaded...";
     var userId = req.user.sub;
     if (!req.files)
@@ -188,6 +231,7 @@ var controller = {
     file_name = file_split[2];
     var file_ext = file_name.split(".")[1];
     var file_ext_valid = ["png", "jpg", "jpeg", "gif"];
+    
     if (file_ext_valid.indexOf(file_ext) < 0) {
       fs.unlink(file_path, (err) => {
         if (err)
@@ -209,9 +253,20 @@ var controller = {
             .send({ message: "Server error to update user" });
         if (!userUpdated)
           return res.status(404).send({ message: "User not updated" });
-        return res
+
+        createAndUploadFile(auth, file_path, file_name).then((response) => {
+          return res
           .status(200)
-          .send({ message: "User updated", user: userUpdated });
+          .send({ message: "User updated", user: userUpdated, response: response });
+        }).catch((err) => {
+          fs.unlink(file_path, (err) => {
+            if (err)
+              return res.status(500).send({ message: "Error to delete file" });
+          });
+          return res.status(500).send({ message: "Error to upload file", error: err });
+        })
+
+
       }
     );
   },
