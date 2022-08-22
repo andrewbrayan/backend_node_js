@@ -113,7 +113,7 @@ var controller = {
       var validate_name = !validator.isEmpty(params.name);
       var validate_surname = !validator.isEmpty(params.surname);
     } catch (error) {
-      return res.status(200).send({ message: "Data not valid or incomplete" });
+      return res.status(200).send({ message: "Data not valid or incomplete", validate_name: validate_name, validate_surname: validate_surname, });
     }
     if (!validate_name || !validate_surname )
       return res.status(200).send({
