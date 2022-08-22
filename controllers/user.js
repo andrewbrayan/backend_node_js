@@ -180,7 +180,7 @@ var controller = {
       return res.status(200).send({ message: "Extension not valid", file_name: file_name });
     }
 
-    User.findByIdAndUpdate( userId, { image: `${__dirname}/public/${file_name}` }, { new: true }, (err, userUpdated) => {
+    User.findByIdAndUpdate( userId, { image: `https://bam-chat.herokuapp.com/public/${file_name}` }, { new: true }, (err, userUpdated) => {
         if (err) return res.status(500).send({ message: "Server error to update user" });
         if (!userUpdated) {
           fs.unlink(file_path, (err) => {
