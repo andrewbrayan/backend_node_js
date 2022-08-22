@@ -2,8 +2,8 @@
 const { default: mongoose } = require('mongoose');
 var moongoose = require('mongoose');
 var app = require('./app');
-var port = process.env.APP_PORT || 3000;
-var host = process.env.APP_HOST || 'http://localhost';
+var port = process.env.PORT || 3000;
+var host = process.env.HOST || 'http://localhost';
 
 // * connect to mongoDB
 moongoose.Promise = global.Promise;
