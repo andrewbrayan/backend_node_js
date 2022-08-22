@@ -6,8 +6,7 @@ var fs = require("fs");
 var path = require("path");
 var User = require("../models/user");
 var jwt = require("../services/jwt");
-var port = process.env.APP_PORT || 3000;
-var host = process.env.APP_HOST || 'http://localhost';
+var port = process.env.PORT || 3000;
 
 var controller = {
   register: function (req, res) {
@@ -168,7 +167,7 @@ var controller = {
     console.log(req.files);
      
     var file_path = req.files.image.path;
-    var file_split = file_path.split("\\");
+    var file_split = file_path.split("/");
         file_name = file_split[2];
     var file_ext = file_name.split(".")[1];
     var file_ext_valid = ["png", "jpg", "jpeg", "gif"];
@@ -181,7 +180,7 @@ var controller = {
       return res.status(200).send({ message: "Extension not valid", file_name: file_name });
     }
 
-    User.findByIdAndUpdate( userId, { image: `${host}:${port}/public/${file_name}` }, { new: true }, (err, userUpdated) => {
+    User.findByIdAndUpdate( userId, { image: `${__dirname}/public/${file_name}` }, { new: true }, (err, userUpdated) => {
         if (err) return res.status(500).send({ message: "Server error to update user" });
         if (!userUpdated) {
           fs.unlink(file_path, (err) => {

@@ -3,7 +3,6 @@ const { default: mongoose } = require('mongoose');
 var moongoose = require('mongoose');
 var app = require('./app');
 var port = process.env.PORT || 3000;
-var host = process.env.HOST || 'http://localhost';
 
 // * connect to mongoDB
 moongoose.Promise = global.Promise;
@@ -14,7 +13,7 @@ moongoose
 
     // * start server
     app.listen(port, () => {
-      console.log(`Server ${host}:${port} is running`);
+      console.log(`Server https://bam-chat.herokuapp.com:${port} is running`);
     });
   })
   .catch((err) => {
