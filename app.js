@@ -30,6 +30,7 @@ app.use((req, res, next) => {
 
 // * rewriter routes
 app.use("/api", [userRoutes, chatRoutes]);
+app.use("/public", express.static(`${__dirname}/uploads/users`));
 
 // * export module
 module.exports = app;
