@@ -3,13 +3,13 @@ var mongoose = require("mongoose");
 var schema = mongoose.Schema;
 
 var userSchema = new schema({
-  name: String,
-  surname: String,
-  username: String,
-  email: String,
-  password: String,
-  image: String,
-  role: String,
+  name: string,
+  surname: string,
+  username: string,
+  email: string,
+  password: string,
+  image: string,
+  role: string,
 });
 
 userSchema.methods.toJSON = function () {

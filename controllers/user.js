@@ -122,7 +122,7 @@ var controller = {
         validate_surname: validate_surname,
       });
 
-    User.findOneAndUpdate( { _id: userId }, { surname: params.name, name: params.surname, role: 'COMPLETE' }, { new: true }, (err, userUpdated) => {
+    User.findOneAndUpdate( { _id: userId }, { surname: params.surname, name: params.name, role: 'COMPLETE' }, { new: true }, (err, userUpdated) => {
       if (err) return res.status(500).send({ message: "Server error to update user" });
       if (!userUpdated) return res.status(404).send({ message: "User not updated" });
 
